@@ -2,7 +2,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import List
 
-from pydantic import BaseSettings, Field
+from pydantic import BaseSettings, Field, validator
 
 
 class Settings(BaseSettings):
@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     jwt_algorithm: str = Field("HS256", env="JWT_ALGORITHM")
     jwt_access_token_expire_minutes: int = Field(60, env="JWT_ACCESS_EXPIRE")
 
-    cors_origins: List[str] = Field(default_factory=lambda: ["*"])
+    cors_origins: List[str] = Field(default_factory=lambda: ["*"], env="CORS_ORIGINS")
 
     openai_api_key: str = Field("", env="OPENAI_API_KEY")
     openai_model: str = Field("gpt-4o", env="OPENAI_MODEL")
@@ -34,6 +34,12 @@ class Settings(BaseSettings):
     class Config:
         env_file = Path(__file__).resolve().parent.parent.parent / ".env"
         env_file_encoding = "utf-8"
+
+    @validator("cors_origins", pre=True)
+    def parse_cors_origins(cls, value: List[str] | str) -> List[str]:  # type: ignore[override]
+        if isinstance(value, str):
+            return [origin.strip() for origin in value.split(",") if origin.strip()]
+        return value
 
 
 @lru_cache()
