@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+.env
+.env.local
+.env.*
+backend/.env
+frontend/.env.local
+node_modules/
+.out/
+.next/
+.DS_Store
+postgres_data/
