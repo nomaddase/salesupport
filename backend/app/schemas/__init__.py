@@ -1,3 +1,3 @@
-from app.schemas import auth, crm
+from app.schemas import api_key, auth, crm
 
-__all__ = ["auth", "crm"]
+__all__ = ["auth", "crm", "api_key"]

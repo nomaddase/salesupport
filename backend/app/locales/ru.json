@@ -1,0 +1,19 @@
+{
+  "auth_success": "Авторизация успешна",
+  "auth_failed": "Неверный логин или пароль",
+  "user_created": "Пользователь успешно создан",
+  "user_updated": "Данные пользователя обновлены",
+  "user_deleted": "Пользователь удалён",
+  "users_list": "Список пользователей получен",
+  "api_key_added": "API ключ добавлен",
+  "api_key_updated": "API ключ обновлён",
+  "api_key_deleted": "API ключ удалён",
+  "api_key_not_found": "API ключ не найден",
+  "api_keys_list": "Список API ключей получен",
+  "forbidden": "Недостаточно прав доступа",
+  "invalid_token": "Недействительный токен",
+  "user_not_found": "Пользователь не найден",
+  "email_already_registered": "Email уже зарегистрирован",
+  "default_admin_ready": "Администратор готов",
+  "profile_loaded": "Профиль пользователя"
+}

@@ -1,6 +1,6 @@
 from functools import lru_cache
 from pathlib import Path
-from typing import List
+from typing import List, Tuple
 
 from pydantic import BaseSettings, Field, validator
 
@@ -31,6 +31,16 @@ class Settings(BaseSettings):
 
     retention_days: int = Field(90, env="RETENTION_DAYS")
 
+    default_locale: str = Field("ru", env="DEFAULT_LOCALE")
+    locale_directory: str = Field(
+        default=str(Path(__file__).resolve().parent.parent / "locales"),
+        env="LOCALE_DIR",
+    )
+    api_key_encryption_secret: str = Field("change-me", env="API_KEY_STORAGE_ENCRYPTION")
+    default_admin_credentials: str = Field(
+        "admin:878707Server", env="DEFAULT_ADMIN_CREDENTIALS"
+    )
+
     class Config:
         env_file = Path(__file__).resolve().parent.parent.parent / ".env"
         env_file_encoding = "utf-8"
@@ -40,6 +50,16 @@ class Settings(BaseSettings):
         if isinstance(value, str):
             return [origin.strip() for origin in value.split(",") if origin.strip()]
         return value
+
+    @validator("default_admin_credentials")
+    def validate_admin_credentials(cls, value: str) -> str:  # type: ignore[override]
+        if ":" not in value:
+            raise ValueError("DEFAULT_ADMIN_CREDENTIALS must be in the format 'username:password'")
+        return value
+
+    def get_default_admin(self) -> Tuple[str, str]:
+        username, password = self.default_admin_credentials.split(":", 1)
+        return username.strip(), password.strip()
 
 
 @lru_cache()
