@@ -2,8 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import useTranslations from '@/hooks/useTranslations';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+import getApiUrl from '@/utils/getApiUrl';
 
 const roleOptions = [
   { value: 'admin', labelKey: 'role_admin' },
@@ -31,11 +30,12 @@ function UserManager({ token }) {
   const [form, setForm] = useState({ name: '', email: '', password: '', role: 'manager' });
   const [editingUser, setEditingUser] = useState(null);
   const [editingForm, setEditingForm] = useState({ name: '', email: '', role: 'manager', password: '' });
+  const apiUrl = getApiUrl();
 
   const usersQuery = useQuery(
-    ['admin-users', token],
+    ['admin-users', token, apiUrl],
     async () => {
-      const response = await axios.get(`${API_URL}/admin/users`, {
+      const response = await axios.get(`${apiUrl}/admin/users`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       return response.data;
@@ -45,7 +45,7 @@ function UserManager({ token }) {
 
   const createUser = useMutation(
     async (payload) => {
-      await axios.post(`${API_URL}/admin/users`, payload, {
+      await axios.post(`${apiUrl}/admin/users`, payload, {
         headers: { Authorization: `Bearer ${token}` }
       });
     },
@@ -59,7 +59,7 @@ function UserManager({ token }) {
 
   const updateUser = useMutation(
     async ({ id, data }) => {
-      await axios.patch(`${API_URL}/admin/users/${id}`, data, {
+      await axios.patch(`${apiUrl}/admin/users/${id}`, data, {
         headers: { Authorization: `Bearer ${token}` }
       });
     },
@@ -73,7 +73,7 @@ function UserManager({ token }) {
 
   const deleteUser = useMutation(
     async (id) => {
-      await axios.delete(`${API_URL}/admin/users/${id}`, {
+      await axios.delete(`${apiUrl}/admin/users/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
     },
