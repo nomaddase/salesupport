@@ -8,9 +8,11 @@ class ClientBase(BaseModel):
     name: str
     phone: str
     email: EmailStr
-    status: str
-    priority: str
-    total_sum: float
+    city: str | None = None
+    demand: str | None = None
+    status: str = "new"
+    priority: str = "medium"
+    total_sum: float = 0.0
 
 
 class ClientCreate(ClientBase):
@@ -18,6 +20,11 @@ class ClientCreate(ClientBase):
 
 
 class ClientUpdate(BaseModel):
+    name: Optional[str] = None
+    phone: Optional[str] = None
+    email: Optional[EmailStr] = None
+    city: Optional[str] = None
+    demand: Optional[str] = None
     status: Optional[str] = None
     priority: Optional[str] = None
     total_sum: Optional[float] = None
@@ -27,6 +34,7 @@ class ClientRead(ClientBase):
     id: int
     manager_id: int
     created_at: datetime
+    updated_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -52,6 +60,7 @@ class ReminderBase(BaseModel):
     client_id: int
     remind_at: datetime
     reason: str
+    status: str = "pending"
     auto_generated: bool = False
 
 

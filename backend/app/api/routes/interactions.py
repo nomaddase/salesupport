@@ -19,7 +19,7 @@ def create_interaction(
     client = db.query(Client).filter(Client.id == interaction_in.client_id, Client.manager_id == current_user.id).first()
     if not client:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Client not found")
-    interaction = Interaction(**interaction_in.dict())
+    interaction = Interaction(**interaction_in.model_dump(exclude_unset=True))
     db.add(interaction)
     db.commit()
     db.refresh(interaction)
