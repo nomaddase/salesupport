@@ -47,10 +47,23 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
 
     if not user:
         user = db.query(User).filter(User.email == form_data.username).first()
-    if not user or not verify_password(form_data.password, user.password_hash):
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={
+                "code": "user_not_found",
+                "message": translate("user_not_found"),
+            },
+        )
+
+    if not verify_password(form_data.password, user.password_hash):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=translate("auth_failed"),
+            detail={
+                "code": "incorrect_password",
+                "message": translate("incorrect_password"),
+            },
         )
 
     access_token = create_access_token(

@@ -41,7 +41,7 @@ export default function Login() {
 
       const token = response.data?.access_token;
       if (!token) {
-        throw new Error('No token received');
+        throw new Error('no_token');
       }
 
       window.localStorage.setItem('token', token);
@@ -60,11 +60,46 @@ export default function Login() {
         setCurrentUser(null);
       }
 
-      router.replace('/dashboard');
+      const navigationResult = await router.replace('/dashboard').catch((navigationError) => {
+        console.error('Не удалось выполнить перенаправление после входа', navigationError);
+        throw new Error('redirect_failed');
+      });
+
+      if (navigationResult === false) {
+        throw new Error('redirect_failed');
+      }
     } catch (loginError) {
       console.error('Ошибка входа', loginError);
-      const message = loginError.response?.data?.detail;
-      setError(typeof message === 'string' ? message : t('login_error'));
+      const response = loginError?.response;
+      const detail = response?.data?.detail;
+
+      if (loginError?.message === 'redirect_failed' && typeof window !== 'undefined') {
+        window.localStorage.removeItem('token');
+      }
+
+      if (detail) {
+        if (typeof detail === 'string') {
+          setError(detail);
+        } else if (typeof detail === 'object') {
+          const translated = detail.code ? t(detail.code) : '';
+          setError(
+            translated && translated !== detail.code
+              ? translated
+              : detail.message || t('login_error')
+          );
+        } else {
+          setError(t('login_error'));
+        }
+      } else if (loginError?.message === 'no_token') {
+        setError(t('login_no_token'));
+      } else if (loginError?.message === 'redirect_failed') {
+        setError(t('no_redirect_path'));
+      } else if (!response) {
+        setError(t('network_error'));
+      } else {
+        const fallbackCode = response.status === 404 ? 'user_not_found' : 'auth_failed';
+        setError(t(fallbackCode));
+      }
     } finally {
       setIsSubmitting(false);
     }
