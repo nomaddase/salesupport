@@ -19,7 +19,7 @@ This repository contains a prototype implementation of an AI-assisted CRM platfo
    ```bash
    docker-compose up --build
    ```
-3. Access the FastAPI docs at `http://localhost:8000/docs` and the Next.js app at `http://localhost:3000` (after running `npm install && npm run dev` inside `frontend/`).
+3. Access the FastAPI docs at `http://45.136.57.52:8000/docs` and the Next.js app at `http://45.136.57.52:3000` (after running `npm install && npm run dev` inside `frontend/`).
 
 ## Backend Tooling
 
@@ -39,7 +39,7 @@ This repository contains a prototype implementation of an AI-assisted CRM platfo
 After starting the stack, verify the backend is running:
 
 ```bash
-curl http://localhost:8000/health
+curl http://45.136.57.52:8000/health
 ```
 
 Expected response:
