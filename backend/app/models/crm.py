@@ -24,11 +24,14 @@ class Client(Base):
     name = Column(String, nullable=False)
     phone = Column(String, nullable=False)
     email = Column(String, nullable=False)
+    city = Column(String, nullable=True)
+    demand = Column(String, nullable=True)
     manager_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     status = Column(String, nullable=False, default="new")
     priority = Column(String, nullable=False, default="medium")
     total_sum = Column(Numeric, nullable=False, default=0)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
     manager = relationship(User, backref="clients")
     interactions = relationship("Interaction", back_populates="client")
@@ -67,6 +70,7 @@ class Reminder(Base):
     remind_at = Column(DateTime, nullable=False)
     reason = Column(String, nullable=False)
     auto_generated = Column(Boolean, default=False)
+    status = Column(String, nullable=False, default="pending")
 
     client = relationship("Client", back_populates="reminders")
 

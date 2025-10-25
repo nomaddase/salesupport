@@ -5,7 +5,7 @@ from fastapi_socketio import SocketManager
 from app.db import base  # noqa: F401  # Ensure models are imported before metadata creation
 from app.db.utils import init_database
 
-from app.api.routes import admin, ai, auth, clients, interactions, push, reminders, system
+from app.api.routes import admin, ai, auth, clients, dashboard, interactions, push, reminders, system
 from app.core.config import get_settings
 from app.services.admin import ensure_default_admin
 
@@ -31,6 +31,7 @@ app.include_router(interactions.router)
 app.include_router(reminders.router)
 app.include_router(ai.router)
 app.include_router(push.router)
+app.include_router(dashboard.router)
 
 
 @app.get("/")

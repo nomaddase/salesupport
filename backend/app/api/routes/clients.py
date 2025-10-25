@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from app.core.deps import get_current_user
@@ -11,8 +11,17 @@ router = APIRouter(prefix="/clients", tags=["clients"])
 
 
 @router.get("", response_model=list[ClientRead])
-def list_clients(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    return db.query(Client).filter(Client.manager_id == current_user.id).all()
+def list_clients(
+    phone_ends: str | None = Query(None, min_length=1, max_length=16),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    query = db.query(Client).filter(Client.manager_id == current_user.id)
+    if phone_ends:
+        suffix = "".join(filter(str.isdigit, phone_ends))
+        if suffix:
+            query = query.filter(Client.phone.ilike(f"%{suffix}"))
+    return query.order_by(Client.created_at.desc()).all()
 
 
 @router.post("", response_model=ClientRead, status_code=status.HTTP_201_CREATED)
@@ -21,7 +30,7 @@ def create_client(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    payload = client_in.dict()
+    payload = client_in.model_dump(exclude_unset=True)
     payload["manager_id"] = current_user.id
     client = Client(**payload)
     db.add(client)
@@ -48,7 +57,7 @@ def update_client(
     client = db.query(Client).filter(Client.id == client_id, Client.manager_id == current_user.id).first()
     if not client:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Client not found")
-    for field, value in client_in.dict(exclude_unset=True).items():
+    for field, value in client_in.model_dump(exclude_unset=True).items():
         setattr(client, field, value)
     db.add(client)
     db.commit()

@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from datetime import datetime, timedelta
+
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from app.core.deps import get_current_user
@@ -19,7 +21,7 @@ def create_reminder(
     client = db.query(Client).filter(Client.id == reminder_in.client_id, Client.manager_id == current_user.id).first()
     if not client:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Client not found")
-    reminder = Reminder(**reminder_in.dict())
+    reminder = Reminder(**reminder_in.model_dump(exclude_unset=True))
     db.add(reminder)
     db.commit()
     db.refresh(reminder)
@@ -27,5 +29,14 @@ def create_reminder(
 
 
 @router.get("", response_model=list[ReminderRead])
-def list_reminders(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    return db.query(Reminder).join(Client).filter(Client.manager_id == current_user.id).all()
+def list_reminders(
+    due_today: bool | None = Query(None),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    query = db.query(Reminder).join(Client).filter(Client.manager_id == current_user.id)
+    if due_today:
+        start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+        end = start + timedelta(days=1)
+        query = query.filter(Reminder.remind_at >= start, Reminder.remind_at < end)
+    return query.order_by(Reminder.remind_at.asc()).all()
