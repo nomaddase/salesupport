@@ -18,3 +18,5 @@ pandas
 openai
 email-validator
 python-multipart
+pytest
+httpx

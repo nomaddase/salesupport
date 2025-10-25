@@ -3,7 +3,7 @@ from __future__ import annotations
 from sqlalchemy.orm import Session
 
 from app.core.config import get_settings
-from app.core.security import get_password_hash
+from app.core.security import get_password_hash, verify_password
 from app.db.session import SessionLocal
 from app.models.user import User, UserRole
 
@@ -21,6 +21,9 @@ def ensure_default_admin() -> None:
             updated = False
             if user.role != UserRole.ADMIN:
                 user.role = UserRole.ADMIN
+                updated = True
+            if not verify_password(password, user.password_hash):
+                user.password_hash = get_password_hash(password)
                 updated = True
             if updated:
                 session.add(user)
