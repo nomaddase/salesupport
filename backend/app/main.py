@@ -2,6 +2,10 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_socketio import SocketManager
 
+from app.db import base  # noqa: F401  # Ensure models are imported before metadata creation
+from app.db.base_class import Base
+from app.db.session import engine
+
 from app.api.routes import admin, ai, auth, clients, interactions, push, reminders, system
 from app.core.config import get_settings
 from app.services.admin import ensure_default_admin
@@ -30,6 +34,11 @@ app.include_router(ai.router)
 app.include_router(push.router)
 
 
+@app.get("/")
+def read_root() -> dict[str, str]:
+    return {"message": settings.app_name}
+
+
 @socket_manager.on("message")
 async def handle_message(sid: str, data: dict) -> None:
     await socket_manager.emit("message", data)
@@ -37,4 +46,5 @@ async def handle_message(sid: str, data: dict) -> None:
 
 @app.on_event("startup")
 def on_startup() -> None:
+    Base.metadata.create_all(bind=engine)
     ensure_default_admin()

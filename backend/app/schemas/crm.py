@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import List, Optional
 
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, ConfigDict
 
 
 class ClientBase(BaseModel):
@@ -28,8 +28,7 @@ class ClientRead(ClientBase):
     manager_id: int
     created_at: datetime
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class InteractionBase(BaseModel):
@@ -46,8 +45,7 @@ class InteractionRead(InteractionBase):
     id: int
     created_at: datetime
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ReminderBase(BaseModel):
@@ -64,8 +62,7 @@ class ReminderCreate(ReminderBase):
 class ReminderRead(ReminderBase):
     id: int
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class FunnelBase(BaseModel):
@@ -80,8 +77,7 @@ class FunnelCreate(FunnelBase):
 class FunnelRead(FunnelBase):
     id: int
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class SalesScriptBase(BaseModel):
@@ -94,8 +90,7 @@ class SalesScriptBase(BaseModel):
 class SalesScriptRead(SalesScriptBase):
     id: int
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class InvoiceBase(BaseModel):
@@ -108,8 +103,7 @@ class InvoiceBase(BaseModel):
 class InvoiceRead(InvoiceBase):
     id: int
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ClientProgressBase(BaseModel):
@@ -122,8 +116,7 @@ class ClientProgressRead(ClientProgressBase):
     id: int
     updated_at: datetime
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class AuditLogRead(BaseModel):
@@ -134,5 +127,4 @@ class AuditLogRead(BaseModel):
     entity_id: int
     timestamp: datetime
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
