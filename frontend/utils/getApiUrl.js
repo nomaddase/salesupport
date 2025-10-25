@@ -1,4 +1,4 @@
-const SERVER_DEFAULT = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const SERVER_DEFAULT = process.env.NEXT_PUBLIC_API_URL || 'http://45.136.57.52:8000';
 
 export default function getApiUrl() {
   if (typeof window === 'undefined') {
