@@ -16,7 +16,7 @@ class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, nullable=False)
+    name = Column(String, unique=True, index=True, nullable=False)
     role = Column(Enum(UserRole, native_enum=False), nullable=False, default=UserRole.MANAGER)
     email = Column(String, unique=True, index=True, nullable=False)
     password_hash = Column(String, nullable=False)

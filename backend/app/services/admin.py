@@ -16,7 +16,7 @@ def ensure_default_admin() -> None:
 
     session: Session = SessionLocal()
     try:
-        user = session.query(User).filter(User.email == username).first()
+        user = session.query(User).filter(User.name == username).first()
         if user:
             updated = False
             if user.role != UserRole.ADMIN:
@@ -25,6 +25,12 @@ def ensure_default_admin() -> None:
             if not verify_password(password, user.password_hash):
                 user.password_hash = get_password_hash(password)
                 updated = True
+            expected_email = (
+                username if "@" in username else f"{username}@example.com"
+            )
+            if user.email != expected_email:
+                user.email = expected_email
+                updated = True
             if updated:
                 session.add(user)
                 session.commit()
@@ -32,7 +38,7 @@ def ensure_default_admin() -> None:
 
         admin = User(
             name=username,
-            email=username,
+            email=username if "@" in username else f"{username}@example.com",
             role=UserRole.ADMIN,
             password_hash=get_password_hash(password),
         )
