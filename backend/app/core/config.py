@@ -2,7 +2,8 @@ from functools import lru_cache
 from pathlib import Path
 from typing import List, Tuple
 
-from pydantic import BaseSettings, Field, validator
+from pydantic import Field, field_validator
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
@@ -41,18 +42,21 @@ class Settings(BaseSettings):
         "admin:878707Server", env="DEFAULT_ADMIN_CREDENTIALS"
     )
 
-    class Config:
-        env_file = Path(__file__).resolve().parent.parent.parent / ".env"
-        env_file_encoding = "utf-8"
+    model_config = SettingsConfigDict(
+        env_file=Path(__file__).resolve().parent.parent.parent / ".env",
+        env_file_encoding="utf-8",
+    )
 
-    @validator("cors_origins", pre=True)
-    def parse_cors_origins(cls, value: List[str] | str) -> List[str]:  # type: ignore[override]
+    @field_validator("cors_origins", mode="before")
+    @classmethod
+    def parse_cors_origins(cls, value: List[str] | str) -> List[str]:
         if isinstance(value, str):
             return [origin.strip() for origin in value.split(",") if origin.strip()]
         return value
 
-    @validator("default_admin_credentials")
-    def validate_admin_credentials(cls, value: str) -> str:  # type: ignore[override]
+    @field_validator("default_admin_credentials")
+    @classmethod
+    def validate_admin_credentials(cls, value: str) -> str:
         if ":" not in value:
             raise ValueError("DEFAULT_ADMIN_CREDENTIALS must be in the format 'username:password'")
         return value
