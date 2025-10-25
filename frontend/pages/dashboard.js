@@ -3,21 +3,22 @@ import io from 'socket.io-client';
 import axios from 'axios';
 import useStore from '@/state/useStore';
 import useTranslations from '@/hooks/useTranslations';
+import useAuthGuard from '@/hooks/useAuthGuard';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 export default function Dashboard() {
   const { t } = useTranslations();
+  const { token, isAuthenticated, isChecking, clearToken } = useAuthGuard();
   const [socket, setSocket] = useState(null);
   const clients = useStore((state) => state.clients);
   const setClients = useStore((state) => state.setClients);
   const setCurrentUser = useStore((state) => state.setCurrentUser);
 
   useEffect(() => {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : '';
+    if (!token) return;
 
     const fetchCurrentUser = async () => {
-      if (!token) return;
       try {
         const response = await axios.get(`${API_URL}/auth/me`, {
           headers: { Authorization: `Bearer ${token}` }
@@ -26,6 +27,9 @@ export default function Dashboard() {
           setCurrentUser(response.data.user);
         }
       } catch (error) {
+        if (error.response?.status === 401) {
+          clearToken();
+        }
         console.error('Не удалось получить пользователя', error);
       }
     };
@@ -33,20 +37,28 @@ export default function Dashboard() {
     const fetchClients = async () => {
       try {
         const response = await axios.get(`${API_URL}/clients`, {
-          headers: token ? { Authorization: `Bearer ${token}` } : {}
+          headers: { Authorization: `Bearer ${token}` }
         });
         setClients(response.data);
       } catch (error) {
+        if (error.response?.status === 401) {
+          clearToken();
+        }
         console.error('Не удалось загрузить клиентов', error);
       }
     };
 
     fetchCurrentUser();
     fetchClients();
-  }, [setClients, setCurrentUser]);
+  }, [clearToken, setClients, setCurrentUser, token]);
 
   useEffect(() => {
-    const socketInstance = io(API_URL, { transports: ['websocket'] });
+    if (!token) return undefined;
+
+    const socketInstance = io(API_URL, {
+      transports: ['websocket'],
+      auth: { token }
+    });
     socketInstance.on('connect', () => {
       setSocket(socketInstance);
     });
@@ -57,12 +69,24 @@ export default function Dashboard() {
     return () => {
       socketInstance.disconnect();
     };
-  }, []);
+  }, [token]);
 
   const highPriority = useMemo(
     () => clients.filter((client) => client.priority === 'high'),
     [clients]
   );
+
+  if (isChecking) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-slate-50">
+        <p className="text-sm text-slate-500">{t('loading')}</p>
+      </main>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return null;
+  }
 
   return (
     <main className="min-h-screen bg-slate-50 p-6">
