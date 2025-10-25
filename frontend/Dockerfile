@@ -10,7 +10,17 @@ ENV npm_config_fetch_timeout=120000 \
 WORKDIR /app
 
 COPY package.json package-lock.json ./
-RUN npm ci --no-audit --progress=false
+RUN set -eux; \
+    npm config set fetch-retry-mintimeout "$npm_config_fetch_retry_mintimeout"; \
+    npm config set fetch-retry-maxtimeout "$npm_config_fetch_retry_maxtimeout"; \
+    npm config set fetch-timeout "$npm_config_fetch_timeout"; \
+    npm config set network-timeout "$npm_config_network_timeout"; \
+    for attempt in 1 2 3; do \
+        npm ci --no-audit --progress=false && break; \
+        echo "npm ci attempt ${attempt} failed, retrying..."; \
+        if [ "${attempt}" = "3" ]; then exit 1; fi; \
+        sleep 5; \
+    done
 
 COPY . .
 
