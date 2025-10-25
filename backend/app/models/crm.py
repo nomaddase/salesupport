@@ -1,7 +1,16 @@
 from datetime import datetime
 
-from sqlalchemy import JSON, Boolean, Column, DateTime, ForeignKey, Integer, Numeric, String
-from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy import (
+    JSON,
+    Boolean,
+    Column,
+    DateTime,
+    ForeignKey,
+    Integer,
+    Numeric,
+    String,
+)
+from sqlalchemy.ext.mutable import MutableList
 from sqlalchemy.orm import relationship
 
 from app.db.base_class import Base
@@ -67,7 +76,7 @@ class Funnel(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)
-    stages = Column(ARRAY(String), nullable=False)
+    stages = Column(MutableList.as_mutable(JSON), nullable=False, default=list)
 
 
 class SalesScript(Base):

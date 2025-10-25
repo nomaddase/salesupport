@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     api_v1_prefix: str = "/api"
 
     database_url: str = Field(
-        "postgresql+psycopg2://postgres:postgres@db:5432/salesupport",
+        "sqlite:///./salesupport.db",
         env="DATABASE_URL",
     )
     redis_url: str = Field("redis://redis:6379/0", env="REDIS_URL")
