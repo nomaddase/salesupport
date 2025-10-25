@@ -14,6 +14,7 @@
   "invalid_token": "Недействительный токен",
   "user_not_found": "Пользователь не найден",
   "email_already_registered": "Email уже зарегистрирован",
+  "username_already_registered": "Псевдоним уже занят",
   "default_admin_ready": "Администратор готов",
   "profile_loaded": "Профиль пользователя"
 }

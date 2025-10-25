@@ -19,7 +19,7 @@ def client(
 ) -> Generator[TestClient, None, None]:
     db_file = tmp_path_factory.mktemp("data", numbered=True) / "test.db"
     monkeypatch.setenv("DATABASE_URL", f"sqlite:///{db_file}")
-    monkeypatch.setenv("DEFAULT_ADMIN_CREDENTIALS", "admin@example.com:StrongPass123")
+    monkeypatch.setenv("DEFAULT_ADMIN_CREDENTIALS", "admin:StrongPass123")
     get_settings.cache_clear()
 
     db_session = importlib.import_module("app.db.session")
@@ -40,7 +40,7 @@ def client(
 def test_default_admin_can_login(client: TestClient) -> None:
     response = client.post(
         "/auth/login",
-        data={"username": "admin@example.com", "password": "StrongPass123"},
+        data={"username": "admin", "password": "StrongPass123"},
     )
     assert response.status_code == 200
     data = response.json()
@@ -61,7 +61,7 @@ def test_register_and_access_protected_route(client: TestClient) -> None:
 
     login_response = client.post(
         "/auth/login",
-        data={"username": "manager@example.com", "password": "MyStrongPass!234"},
+        data={"username": "Manager", "password": "MyStrongPass!234"},
     )
     assert login_response.status_code == 200
     token = login_response.json()["access_token"]
