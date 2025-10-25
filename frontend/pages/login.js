@@ -112,7 +112,19 @@ export default function Login() {
 
           <button
             type="submit"
-            className="w-full rounded-lg bg-emerald-500 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-600 disabled:cursor-not-allowed disabled:opacity-70"
+            className={[
+              'w-full',
+              'rounded-lg',
+              'bg-emerald-500',
+              'px-4',
+              'py-2',
+              'text-sm',
+              'font-semibold',
+              'text-white',
+              'hover:bg-emerald-600',
+              'disabled:cursor-not-allowed',
+              'disabled:opacity-70'
+            ].join(' ')}
             disabled={isSubmitting}
           >
             {isSubmitting ? t('loading') : t('login_button')}
