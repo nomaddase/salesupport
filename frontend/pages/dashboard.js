@@ -4,8 +4,7 @@ import axios from 'axios';
 import useStore from '@/state/useStore';
 import useTranslations from '@/hooks/useTranslations';
 import useAuthGuard from '@/hooks/useAuthGuard';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+import getApiUrl from '@/utils/getApiUrl';
 
 export default function Dashboard() {
   const { t } = useTranslations();
@@ -15,12 +14,14 @@ export default function Dashboard() {
   const setClients = useStore((state) => state.setClients);
   const setCurrentUser = useStore((state) => state.setCurrentUser);
 
+  const apiUrl = getApiUrl();
+
   useEffect(() => {
     if (!token) return;
 
     const fetchCurrentUser = async () => {
       try {
-        const response = await axios.get(`${API_URL}/auth/me`, {
+        const response = await axios.get(`${apiUrl}/auth/me`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         if (response.data?.user) {
@@ -36,7 +37,7 @@ export default function Dashboard() {
 
     const fetchClients = async () => {
       try {
-        const response = await axios.get(`${API_URL}/clients`, {
+        const response = await axios.get(`${apiUrl}/clients`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setClients(response.data);
@@ -50,12 +51,12 @@ export default function Dashboard() {
 
     fetchCurrentUser();
     fetchClients();
-  }, [clearToken, setClients, setCurrentUser, token]);
+  }, [apiUrl, clearToken, setClients, setCurrentUser, token]);
 
   useEffect(() => {
     if (!token) return undefined;
 
-    const socketInstance = io(API_URL, {
+    const socketInstance = io(apiUrl, {
       transports: ['websocket'],
       auth: { token }
     });
@@ -69,7 +70,7 @@ export default function Dashboard() {
     return () => {
       socketInstance.disconnect();
     };
-  }, [token]);
+  }, [apiUrl, token]);
 
   const highPriority = useMemo(
     () => clients.filter((client) => client.priority === 'high'),

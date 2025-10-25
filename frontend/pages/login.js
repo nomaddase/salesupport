@@ -3,8 +3,7 @@ import { useRouter } from 'next/router';
 import axios from 'axios';
 import useTranslations from '@/hooks/useTranslations';
 import useStore from '@/state/useStore';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+import getApiUrl from '@/utils/getApiUrl';
 
 export default function Login() {
   const { t } = useTranslations();
@@ -13,6 +12,7 @@ export default function Login() {
   const [form, setForm] = useState({ username: '', password: '' });
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const apiUrl = getApiUrl();
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -35,7 +35,7 @@ export default function Login() {
       params.append('password', form.password);
       params.append('scope', '');
 
-      const response = await axios.post(`${API_URL}/auth/login`, params, {
+      const response = await axios.post(`${apiUrl}/auth/login`, params, {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
       });
 
@@ -47,7 +47,7 @@ export default function Login() {
       window.localStorage.setItem('token', token);
 
       try {
-        const meResponse = await axios.get(`${API_URL}/auth/me`, {
+        const meResponse = await axios.get(`${apiUrl}/auth/me`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         if (meResponse.data?.user) {

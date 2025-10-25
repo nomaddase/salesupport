@@ -4,21 +4,21 @@ import AdminPanel from '@/components/AdminPanel';
 import useStore from '@/state/useStore';
 import useTranslations from '@/hooks/useTranslations';
 import useAuthGuard from '@/hooks/useAuthGuard';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+import getApiUrl from '@/utils/getApiUrl';
 
 export default function Settings() {
   const { t } = useTranslations();
   const { token, isAuthenticated, isChecking, clearToken } = useAuthGuard();
   const currentUser = useStore((state) => state.currentUser);
   const setCurrentUser = useStore((state) => state.setCurrentUser);
+  const apiUrl = getApiUrl();
 
   useEffect(() => {
     if (!token || currentUser) return;
 
     const fetchUser = async () => {
       try {
-        const response = await axios.get(`${API_URL}/auth/me`, {
+        const response = await axios.get(`${apiUrl}/auth/me`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         if (response.data?.user) {
@@ -33,7 +33,7 @@ export default function Settings() {
     };
 
     fetchUser();
-  }, [clearToken, currentUser, setCurrentUser, token]);
+  }, [apiUrl, clearToken, currentUser, setCurrentUser, token]);
 
   if (isChecking) {
     return (
