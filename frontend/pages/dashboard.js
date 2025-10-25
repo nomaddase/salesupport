@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import io from 'socket.io-client';
 import axios from 'axios';
@@ -91,9 +92,17 @@ export default function Dashboard() {
 
   return (
     <main className="min-h-screen bg-slate-50 p-6">
-      <header className="mb-10">
-        <h1 className="text-3xl font-bold text-slate-900">{t('dashboard')}</h1>
-        <p className="text-slate-600">{t('clients')}</p>
+      <header className="mb-10 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-slate-900">{t('dashboard')}</h1>
+          <p className="text-slate-600">{t('clients')}</p>
+        </div>
+        <Link
+          href="/admin"
+          className="inline-flex items-center justify-center rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-700"
+        >
+          {t('go_to_admin_panel')}
+        </Link>
       </header>
 
       <section className="grid gap-6 md:grid-cols-3">
