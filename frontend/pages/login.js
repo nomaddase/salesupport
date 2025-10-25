@@ -30,8 +30,10 @@ export default function Login() {
 
     try {
       const params = new URLSearchParams();
+      params.append('grant_type', 'password');
       params.append('username', form.username);
       params.append('password', form.password);
+      params.append('scope', '');
 
       const response = await axios.post(`${API_URL}/auth/login`, params, {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
